@@ -1,0 +1,23 @@
+<PreferenceScreen
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+            app:title="General">
+
+        <ListPreference
+                app:key="theme"
+                app:title="App Theme"
+                app:entries="@array/themeChoices"
+                app:entryValues="@array/themeValues"
+                app:defaultValue="light"
+                app:useSimpleSummaryProvider="true"/>
+
+    </PreferenceCategory>
+
+    <Preference
+            app:key="thanks"
+            app:title="Thank you for using this app!"
+            app:summary="Feel free to DM suggestions"
+            />
+
+</PreferenceScreen>

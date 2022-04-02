@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_500">#673AB7</color>
+    <color name="purple_800">#6A1B9A</color>
+    <color name="purple_900">#4A148C</color>
+    <color name="purple_a700">#6200EA</color>
+
+    <color name="purpleDark_500">#3A2167</color>
+    <color name="purpleDark_800">#241553</color>
+
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="gray">#707070</color>
+    <color name="transparent">#00000000</color>
+    <color name="transparent_dark">#80000000</color>
+    <color name="transparent_darker">#B3000000</color>
+
+</resources>

@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="252dp"
+        >
+
+    <LinearLayout
+            android:id="@+id/notifExpandedSelectorHolder"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_marginTop="5dp"
+            android:weightSum="4"
+            android:orientation="horizontal"
+            android:background="@color/transparent_darker"
+            >
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                >
+
+            <ImageView
+                    android:id="@+id/notifCollapseSongsView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/song_icon"
+                    android:layout_centerInParent="true"
+                    />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                >
+
+            <ImageView
+                    android:id="@+id/notifCollapsePlaylistsView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/playlist_icon"
+                    android:layout_centerInParent="true"
+                    />
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                >
+
+            <ImageView
+                    android:id="@+id/notifCollapseAlbumsView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/album_icon"
+                    android:layout_centerInParent="true"
+                    />
+        </RelativeLayout>
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                >
+
+            <ImageView
+                    android:id="@+id/notifCollapseFoldersView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/folders_icon"
+                    android:layout_centerInParent="true"
+                    />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+            android:id="@+id/notifExpandedSongsViewHolder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/notifExpandedSelectorHolder"
+            android:visibility="visible">
+
+        <ListView
+                android:id="@+id/notifExpandedListView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
+    </RelativeLayout>
+    <RelativeLayout
+            android:id="@+id/notifExpandedPlaylistsViewHolder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/notifExpandedSelectorHolder"
+            android:visibility="gone">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Playlists Layout"
+                android:layout_centerInParent="true"
+                android:textSize="20sp" />
+    </RelativeLayout>
+    <RelativeLayout
+            android:id="@+id/notifExpandedAlbumsViewHolder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/notifExpandedSelectorHolder"
+            android:visibility="gone">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Albums Layout"
+                android:layout_centerInParent="true"
+                android:textSize="20sp" />
+    </RelativeLayout>
+    <RelativeLayout
+            android:id="@+id/notifExpandedFoldersViewHolder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/notifExpandedSelectorHolder"
+            android:visibility="gone">
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Folders Layout"
+                android:layout_centerInParent="true"
+                android:textSize="20sp" />
+    </RelativeLayout>
+
+</RelativeLayout>
