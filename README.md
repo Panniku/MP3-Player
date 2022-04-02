@@ -11,6 +11,16 @@ Overlay based Android 4.4 themed(?) song player for Android 6+
 
 #### If overlay does not appear, this may be an issue on my side or on your device.
 
+- Sample images
+> Main window
+![Main window](/assets/main_window.png)
+
+> Mini window
+![Mini window](/assets/mini_window.png)
+
+> Tiny (secret) window
+![Mini window](/assets/tiny_window.png)
+
 - Features (Still more to come)
 > <p>Android 4.4 (Kitkat) default song player's UI. (Not 100% accurate)<br>
 
