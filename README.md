@@ -14,13 +14,13 @@ Overlay based Android 4.4 themed(?) song player for Android 6+
 - Sample images
 
 > Main window
-![Main window](/assets/main_window.png)
+> ![Main window](/assets/main_window.png)
 
 > Mini window
-![Mini window](/assets/mini_window.png)
+> ![Mini window](/assets/mini_window.png)
 
 > Tiny (secret) window
-![Mini window](/assets/tiny_window.png)
+> ![Mini window](/assets/tiny_window.png)
 
 
 - Features (Still more to come)
