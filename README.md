@@ -9,7 +9,7 @@ Overlay based Android 4.4 themed(?) song player for Android 6+
 5. Next, allow permissions for files and audio (files are for indexing songs, audio is for the small visualizer)
 6. Once all permissions are granted, tap the button and voila! The overlay should appear!
 
-#### If overlay does not appear, this may be an issue on my side or on your device.
+#### If overlay does not appear, this is an issue in the code. i am not sure where it occurs but i will try to fix it soon
 
 - Sample images
 > Main window
