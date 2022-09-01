@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+
+    <RelativeLayout
+            android:padding="0dp"
+            android:layout_width="240dp"
+            android:layout_height="40dp"
+            >
+
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0.1dp"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="0dp"
+                android:background="@color/gray"
+                android:backgroundTintMode="multiply"
+                />
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="0.1dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="0dp"
+                android:background="@color/gray"
+                android:backgroundTintMode="multiply"
+                />
+
+
+        <ImageView
+                android:id="@+id/playlistThumb"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentStart="true"
+                android:layout_marginTop="2dp"
+                android:layout_marginStart="2dp"
+                android:layout_marginBottom="2dp"
+                android:layout_marginEnd="2dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/song_image"
+                >
+
+        </ImageView>
+
+        <TextView
+                android:id="@+id/playlistName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="2dp"
+                android:layout_marginEnd="5dp"
+                android:layout_toEndOf="@+id/playlistThumb"
+                android:layout_marginTop="2dp"
+                android:padding="0dp"
+                android:text="Playlist Name"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:scrollHorizontally="true"
+                />
+
+        <TextView
+                android:id="@+id/playlistCreationDate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/playlistName"
+                android:layout_alignParentEnd="true"
+                android:layout_toEndOf="@+id/playlistThumb"
+                android:layout_marginEnd="5dp"
+                android:layout_marginStart="2dp"
+                android:text="Created at DD/MM/YYYY"
+                android:textColor="@color/gray"
+                android:textSize="13sp"
+                android:singleLine="true"
+                android:ellipsize="marquee"
+                android:scrollHorizontally="true"
+                />
+
+    </RelativeLayout>
+</FrameLayout>

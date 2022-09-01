@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <size android:width="150dp"
+                  android:height="150dp">
+
+            </size>
+
+            <stroke android:color="#2E2E2E"
+                    android:width="2dp">
+
+            </stroke>
+            <solid android:color="@color/cardview_shadow_start_color">
+
+            </solid>
+        </shape>
+    </item>
+    <item android:drawable="@drawable/song_icon"
+            android:left="30dp"
+            android:right="30dp"
+            android:top="30dp"
+            android:bottom="30dp">
+
+    </item>
+</layer-list>

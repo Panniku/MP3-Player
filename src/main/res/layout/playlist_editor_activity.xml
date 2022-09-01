@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+    <TextView
+            android:id="@+id/editorNameText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="5dp"
+            android:text="Enter/Edit playlist icon"
+            android:textSize="16sp"/>
+
+    <EditText
+            android:id="@+id/editorEnterText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/editorNameText"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="5dp"
+            android:textIsSelectable="true"
+            android:maxLines="1"
+            android:hint="My Playlist"
+            />
+
+    <TextView
+            android:id="@+id/editorGalleryText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/editorEnterText"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="5dp"
+            android:text="Choose playlist icon"
+            android:textSize="16sp"/>
+
+    <ImageView
+            android:id="@+id/editorOpenGallery"
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:src="@drawable/song_image"
+            android:layout_below="@id/editorGalleryText"
+            android:layout_marginStart="5dp"
+            android:layout_marginTop="5dp"
+            />
+    
+    <Button
+            android:id="@+id/editorConfirm"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="5dp"
+            android:layout_marginStart="5dp"
+            android:layout_below="@+id/editorOpenGallery"
+            android:text="Confirm"
+            android:textAllCaps="false"/>
+</RelativeLayout>
