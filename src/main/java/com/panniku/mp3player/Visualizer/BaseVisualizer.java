@@ -63,7 +63,7 @@ public abstract class BaseVisualizer extends View {
             public void onFftDataCapture(Visualizer visualizer, byte[] bytes, int i) {
                 //
             }
-        }, (int) (Visualizer.getMaxCaptureRate() / 1), true, false);
+        }, (int) (Visualizer.getMaxCaptureRate() / 2), true, false);
         visualizer.setEnabled(true);
     }
 

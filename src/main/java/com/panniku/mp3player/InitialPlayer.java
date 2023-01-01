@@ -7,6 +7,7 @@ import android.util.Log;
 import com.panniku.mp3player.Constructors.SongsConstructor;
 import com.panniku.mp3player.Overlay.OverlayPlayer;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class InitialPlayer {
@@ -50,7 +51,11 @@ public class InitialPlayer {
             public void onPrepared(MediaPlayer mediaPlayer) {
                 mediaPlayer.start();
                 OverlayPlayer.getStatusbarText().setText("Playing \"" + songsArrayList.get(InitialPlayer.getPos()).getTitle() + "\"");
-                OverlayPlayer.updateMiniPlayer();
+                try {
+                    OverlayPlayer.updateMiniPlayer();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 Log.d("InitialPlayer", "Playing " + songsArrayList.get(pos).getTitle());
                 Log.d("InitialPlayer", "Checking ID: " + mediaPlayer.getAudioSessionId());
                 //Log.d("InitialPlayer", "Tracking Bytes: " + Arrays.toString(OverlayPlayer.getVisualizer().getBytes()));
@@ -62,7 +67,11 @@ public class InitialPlayer {
                 String curLoop = OverlayPlayer.getCurrentLoop();
                 switch(curLoop){
                     case "All":
-                        seekNext(context);
+                        try {
+                            seekNext(context);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         Log.d("InitialPlayer", "Case ALL: Seeking Next.");
                         break;
                     case "This":
@@ -88,7 +97,7 @@ public class InitialPlayer {
 
     }
 
-    public static void resume(Context context) {
+    public static void resume(Context context) throws IOException {
         isPaused = false;
         mediaPlayer.seekTo(length);
         mediaPlayer.start();
@@ -96,7 +105,7 @@ public class InitialPlayer {
         Log.d("mediaPlayer", "Length: " + length);
     }
 
-    public static void seekPrevious(Context context) {
+    public static void seekPrevious(Context context) throws IOException {
         stop();
         thisPos--;
         Log.d("seekprev", "thisPos: " + thisPos);
@@ -111,7 +120,7 @@ public class InitialPlayer {
         OverlayPlayer.getStatusbarText().setText("Seeking previous.");
     }
 
-    public static void seekNext(Context context) {
+    public static void seekNext(Context context) throws IOException {
         stop();
         thisPos++;
         if(thisPos > songsArrayList.size() - 1){
@@ -125,7 +134,7 @@ public class InitialPlayer {
         OverlayPlayer.getStatusbarText().setText("Seeking next.");
     }
 
-    private static void seek(Context context, int pos){
+    private static void seek(Context context, int pos) throws IOException {
         Log.d("seek", "pos: " + pos);
         length = 0;
         //Uri uri = Uri.parse(songUriArrayList.get(pos).getPath());

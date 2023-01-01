@@ -1,7 +1,12 @@
 package com.panniku.mp3player;
 
 import android.Manifest;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -24,11 +29,15 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener;
 import com.karumi.dexter.listener.single.PermissionListener;
+import com.panniku.mp3player.Notification.NotificationCreator;
+import com.panniku.mp3player.Notification.PlayActions;
 import com.panniku.mp3player.Overlay.OverlayPlayer;
 
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+
+    NotificationManager notifManager;
 
     private TextView text;
     private Button button;
@@ -39,6 +48,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
 
         text = findViewById(R.id.permissionText);
         button = findViewById(R.id.startOverlay);
@@ -91,17 +102,4 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (requestCode == ACTION_MANAGE_OVERLAY_PERMISSION_REQUEST_CODE) {
-//            if (Settings.canDrawOverlays(this)) {
-//                Log.d("result", "Starting...");
-//                startService(new Intent(MainActivity.this, OverlayPlayer.class));
-//            } else {
-//                Toast.makeText(this, "Enable permission by Settings -> Apps -> Draw over other apps!", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
 }

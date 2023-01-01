@@ -2,7 +2,9 @@ package com.panniku.mp3player.Adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.panniku.mp3player.Constructors.SongsConstructor;
 import com.panniku.mp3player.R;
 import com.panniku.mp3player.Utils.Utils;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -70,6 +73,16 @@ public class SecondaryAdapter extends RecyclerView.Adapter<SecondaryAdapter.Seco
         holder.songName.setText(songsConstructor.get(position).getTitle());
         holder.songArtist.setText(songsConstructor.get(position).getArtist());
         holder.songDuration.setText(Utils.getTimeFormatted(songsConstructor.get(position).getDuration()));
+
+        Log.d("onBingViewHolder POSITION", "" + Integer.getInteger(String.valueOf(songsConstructor.get(position))));
+
+//        Uri songArt = Utils.getAlbumArt(Integer.getInteger(String.valueOf(songsConstructor.get(position))));
+//        if(songArt != null){
+//            //holder.songThumb.setImageBitmap(bitmap);
+//            Picasso.get().load(songArt).into(holder.songThumb);
+//        } else {
+//            Picasso.get().load(R.drawable.song_image).into(holder.songThumb);
+//        }
 
         Bitmap bitmap = Utils.getAlbumArt(songsConstructor.get(position).getPath());
         if(bitmap != null){

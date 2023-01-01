@@ -2,6 +2,7 @@ package com.panniku.mp3player.Adapters;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.panniku.mp3player.Constructors.SongsConstructor;
 import com.panniku.mp3player.R;
 import com.panniku.mp3player.Utils.Utils;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
@@ -101,6 +103,14 @@ public class SelectorRecyclerViewAdapter extends RecyclerView.Adapter<SelectorRe
         holder.songName.setText(songsConstructor.get(position).getTitle());
         holder.songArtist.setText(songsConstructor.get(position).getArtist());
         holder.songDuration.setText(Utils.getTimeFormatted(songsConstructor.get(position).getDuration()));
+
+//        Uri songArt = Utils.getAlbumArt(position);
+//        if(songArt != null){
+//            //holder.songThumb.setImageBitmap(bitmap);
+//            Picasso.get().load(songArt).into(holder.songThumb);
+//        } else {
+//            Picasso.get().load(R.drawable.song_image).into(holder.songThumb);
+//        }
 
         Bitmap bitmap = Utils.getAlbumArt(songsConstructor.get(position).getPath());
         if(bitmap != null){

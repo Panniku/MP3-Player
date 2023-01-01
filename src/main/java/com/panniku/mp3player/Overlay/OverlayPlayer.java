@@ -1,28 +1,34 @@
 package com.panniku.mp3player.Overlay;
 
 import android.annotation.SuppressLint;
+import android.app.DownloadManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.provider.MediaStore;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Patterns;
+import android.util.SparseArray;
 import android.view.*;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.widget.*;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import at.huber.youtubeExtractor.VideoMeta;
+import at.huber.youtubeExtractor.YouTubeExtractor;
+import at.huber.youtubeExtractor.YtFile;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.panniku.mp3player.*;
@@ -32,20 +38,23 @@ import com.panniku.mp3player.Adapters.SelectorRecyclerViewAdapter;
 import com.panniku.mp3player.Constructors.PlaylistsConstructor;
 import com.panniku.mp3player.Constructors.SongsConstructor;
 import com.panniku.mp3player.Adapters.SongRecyclerViewAdapter;
+import com.panniku.mp3player.Notification.NotificationCreator;
 import com.panniku.mp3player.Utils.Utils;
 import com.panniku.mp3player.Visualizer.BarVisualizer;
+import com.squareup.picasso.Picasso;
 
+import java.io.*;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class OverlayPlayer extends Service {
 
     /*
     * This class will house all the main components of this window:
     * 1. Main overlay window
-    * 2. Optional? To-Do? - Settings (Maybe....who knows)
-    * 3. Container of all 4 layouts with additional (Playlist, folders.........)
+    * 2. Container of all 4 layouts with additional (Playlist, folders.........)
+    * 3. Functionality of all 4 layouts
+    * 4. Miscellaneous code
     * */
 
     @Nullable
@@ -54,11 +63,9 @@ public class OverlayPlayer extends Service {
         return null;
     }
 
-    private ImageView tinyDrag;
     private static RelativeLayout tinyRoot;
     private static ImageView tinyArtwork;
     private static TextView tinySongTitle;
-    private static ImageView tinyPrev, tinyPlayPause, tinyNext;
 
     // MAIN WINDOW
     private RelativeLayout windowLayout, mainLayout;
@@ -107,8 +114,18 @@ public class OverlayPlayer extends Service {
     private TextView opacityText;
     private SeekBar opacitySeekbar;
 
-    private RelativeLayout songsView, playlistsView, albumsView, foldersView;
-    private RelativeLayout songsRoot, playlistsRoot, albumsRoot, foldersRoot;
+    private TextView tinyTypeText;
+    private TextView tinyTogglerTxt;
+
+    private TextView rewriteCache;
+
+    private TextView toAboutView;
+
+
+    //
+    private RelativeLayout songsView, playlistsView, albumsView, downloaderView;
+    private RelativeLayout songsRoot, playlistsRoot, albumsRoot, downloaderRoot;
+
 
     // SONGS
     private ImageView shuffleImage, reloadImage;
@@ -125,10 +142,32 @@ public class OverlayPlayer extends Service {
     private static PlaylistsRecyclerViewAdapter playlistsRecyclerViewAdapter;
     private RecyclerView playlistsRecyclerView;
 
+    // DOWNLOADER
+    private RelativeLayout downloaderBuffer;
+    private ImageView downloaderHelp;
+    private ImageView downloaderPaste;
+    private ImageView downloaderKB;
+    private EditText downloaderURLText;
+    private ImageView downloaderSearch;
+    private RelativeLayout downloaderInfo;
+    private TextView dlName, dlAuthor, dlViews;
+    private ImageView dlThumb;
+    private ImageView downloaderDL;
+    public static String songURL;
+    public static String dlURL, dlNameStr;
+
     // TODO sections
+
+    // ABOUT
+    private RelativeLayout aboutRoot;
 
     // STATUS BAR
     private static TextView statusbarText;
+
+
+    //
+    // NOTIFICATION
+    private NotificationManager notifManager;
 
     // DATA - SAVING AND LOADING
     //TEMP
@@ -140,23 +179,41 @@ public class OverlayPlayer extends Service {
     private static final String toSaveOpacityString = "toSaveOpacity";
     private static final String toSaveSeekbarPosString = "toSaveSeekbarPosString";
 
+    private static final String toSaveTinyPlayerTypeString = "toSaveTinyPlayerTypeString";
+    private static final String toSaveTinyChangeString = "toSaveTinyChangeString";
+
+    //
     private static float toSaveOpacity;
     private static int toSaveSeekbarPos;
+
+    private static String toSaveType;
+    private static String toSaveTxt;
 
     // LOAD
     private static float toLoadOpacity;
     private static int toLoadSeekbarPos;
 
+    private static String toLoadTinyPlayerType;
+    private static String toLoadTinyChangeTxt;
+
+    // CACHE
+    // WRITE CACHE
+    private OutputStream outputStream;
+    public static String cacheDir;
+
     // MISC
+    private static Context thisContext;
     private RelativeLayout no_songs;
     private boolean isMainView = true, isSettingsView = false;
     private static boolean isPlaying;
-
+    private static boolean isNotif;
+    private String prevStatus;
     int animTime;
     int durWidth;
 
     boolean isExpanded = false;
     private static String isLoop;
+    ImageView secret;
 
     @SuppressLint("ClickableViewAccessibility")
     @Override
@@ -189,13 +246,9 @@ public class OverlayPlayer extends Service {
         toSaveOpacity = params.alpha;
         window.addView(windowView, params);
 
-        tinyDrag = windowView.findViewById(R.id.overlayTinyDrag);
         tinyRoot = windowView.findViewById(R.id.overlayTinyRoot);
         tinyArtwork = windowView.findViewById(R.id.overlayTinyArtwork);
         tinySongTitle = windowView.findViewById(R.id.overlayTinySongTitle);
-        tinyPrev = windowView.findViewById(R.id.overlayTinySeekPrev);
-        tinyPlayPause = windowView.findViewById(R.id.overlayTinyPlayPause);
-        tinyNext = windowView.findViewById(R.id.overlayTinySeekNext);
 
         // MAIN WINDOW AND ROOT LAYOUTS
         windowLayout = windowView.findViewById(R.id.overlayExpandedRoot);
@@ -242,16 +295,23 @@ public class OverlayPlayer extends Service {
         opacityText = windowView.findViewById(R.id.overlaySettingsOpacityTextCounter);
         opacitySeekbar = windowView.findViewById(R.id.overlaySettingsOpacitySeekbar);
 
+        tinyTypeText = windowView.findViewById(R.id.overlaySettingsTinyPlayerType);
+        tinyTogglerTxt = windowView.findViewById(R.id.overlaySettingsTinyPlayerToggler);
+
+        rewriteCache = windowView.findViewById(R.id.settingRecacheText);
+
+        toAboutView = windowView.findViewById(R.id.settingsAboutTxt);
+
         // MAIN VIEW
         songsView = windowView.findViewById(R.id.overlayExpandedSongsView);
         playlistsView = windowView.findViewById(R.id.overlayExpandedPlaylistsView);
         albumsView = windowView.findViewById(R.id.overlayExpandedAlbumsView);
-        foldersView = windowView.findViewById(R.id.overlayExpandedFoldersView);
+        downloaderView = windowView.findViewById(R.id.overlayExpandedDownloaderView);
 
         songsRoot = windowView.findViewById(R.id.overlaySongsRoot);
         playlistsRoot = windowView.findViewById(R.id.overlayPlaylistsRoot);
         albumsRoot = windowView.findViewById(R.id.overlayAlbumsRoot);
-        foldersRoot = windowView.findViewById(R.id.overlayFoldersRoot);
+        downloaderRoot = windowView.findViewById(R.id.overlayDownloaderRoot);
 
         // SONGS
         shuffleImage = windowView.findViewById(R.id.overlaySongsShuffle);
@@ -262,9 +322,24 @@ public class OverlayPlayer extends Service {
         // PLAYLISTS
         playlistAddList = windowView.findViewById(R.id.overlayPlaylistsAddNewList);
 
-
+        // DOWNLOADER
+        downloaderBuffer = windowView.findViewById(R.id.overlayDownloaderBuffer);
+        downloaderHelp = windowView.findViewById(R.id.downloaderHelp);
+        downloaderPaste = windowView.findViewById(R.id.downloaderPasteText);
+        downloaderKB = windowView.findViewById(R.id.downloaderToggleKB);
+        downloaderURLText = windowView.findViewById(R.id.downloaderURLText);
+        downloaderSearch = windowView.findViewById(R.id.downloaderSearchURL);
+        downloaderInfo = windowView.findViewById(R.id.downloaderInfo);
+        dlName = windowView.findViewById(R.id.dlName);
+        dlAuthor = windowView.findViewById(R.id.dlAuthor);
+        dlViews = windowView.findViewById(R.id.dlViews);
+        dlThumb = windowView.findViewById(R.id.dlThumb);
+        downloaderDL = windowView.findViewById(R.id.downloaderDLURL);
 
         // TODO every other section
+
+        // about
+        aboutRoot = windowView.findViewById(R.id.overlayAboutRoot);
 
         // STATUS BAR
         statusbarText = windowView.findViewById(R.id.overlayStatusbarSongSizeText);
@@ -281,6 +356,7 @@ public class OverlayPlayer extends Service {
             songsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
             songsRecyclerView.setAdapter(songRecyclerViewAdapter);
             songsRecyclerView.setNestedScrollingEnabled(false);
+            songsRecyclerView.setHasFixedSize(true);
             songRecyclerViewAdapter.notifyDataSetChanged();
         } else {
             no_songs.setVisibility(View.VISIBLE);
@@ -299,32 +375,62 @@ public class OverlayPlayer extends Service {
         playlistsRecyclerView.setAdapter(playlistsRecyclerViewAdapter);
         playlistsRecyclerView.setNestedScrollingEnabled(false);
 
-        barVisualizer.setColor(Color.parseColor("#9d79a8"));
+        barVisualizer.setColor(Color.parseColor("#FFFFFF"));
         barVisualizer.setDensity(5); // n + 1
         statusbarText.setText("Loaded " + songUriArrayList.size() + " songs.");
         isLoop = "All";
 
-        tinySongTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-        tinySongTitle.setSelected(true);
 
-        miniSongTitle.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-        miniSongTitle.setSelected(true);
+        //
+        //
+        //
+        // NOTIFICATION
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+//            createChannel();
+//        }
 
-        miniSongArtist.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-        miniSongArtist.setSelected(true);
+        //startService(new Intent(OverlayPlayer.this, RecentServiceClear.class));
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            createChannel();
+        }
+        registerReceiver(receiver, new IntentFilter("TOGGLER"));
 
-        statusbarText.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-        statusbarText.setSelected(true);
 
         // MISC
+        thisContext = OverlayPlayer.this;
         new InitialPlayer().init(songUriArrayList);
 
         songsRoot.setVisibility(View.VISIBLE);
+        playlistsRoot.setVisibility(View.GONE);
+        albumsRoot.setVisibility(View.GONE);
+        downloaderRoot.setVisibility(View.GONE);
+        settingsLayout.setVisibility(View.GONE);
+
         opacityText.setText(String.valueOf(toLoadSeekbarPos));
         opacitySeekbar.setProgress(toLoadSeekbarPos);
 
+        tinyTypeText.setText(toLoadTinyPlayerType);
+        tinyTogglerTxt.setText(toLoadTinyChangeTxt);
+
+        if(toLoadTinyPlayerType == "Notification"){
+            isNotif = true;
+        } else {
+            isNotif = false;
+        }
         durWidth = miniSongDuration.getLayoutParams().width;
 
+        secret = windowView.findViewById(R.id.secret);
+        secret.setOnClickListener(new View.OnClickListener() {
+            int taps = 0;
+            @Override
+            public void onClick(View view) {
+                taps++;
+                if(taps == 4){
+                    Toast.makeText(OverlayPlayer.this, "???", Toast.LENGTH_SHORT).show();
+                    taps = 0;
+                }
+            }
+        });
         //new WindowToast().init();
 
         // EVENTS
@@ -334,7 +440,7 @@ public class OverlayPlayer extends Service {
                 songsRoot.setVisibility(View.VISIBLE);
                 playlistsRoot.setVisibility(View.GONE);
                 albumsRoot.setVisibility(View.GONE);
-                foldersRoot.setVisibility(View.GONE);
+                downloaderRoot.setVisibility(View.GONE);
             }
         });
         playlistsView.setOnClickListener(new View.OnClickListener() {
@@ -343,7 +449,7 @@ public class OverlayPlayer extends Service {
                 songsRoot.setVisibility(View.GONE);
                 playlistsRoot.setVisibility(View.VISIBLE);
                 albumsRoot.setVisibility(View.GONE);
-                foldersRoot.setVisibility(View.GONE);
+                downloaderRoot.setVisibility(View.GONE);
             }
         });
         albumsView.setOnClickListener(new View.OnClickListener() {
@@ -352,16 +458,16 @@ public class OverlayPlayer extends Service {
                 songsRoot.setVisibility(View.GONE);
                 playlistsRoot.setVisibility(View.GONE);
                 albumsRoot.setVisibility(View.VISIBLE);
-                foldersRoot.setVisibility(View.GONE);
+                downloaderRoot.setVisibility(View.GONE);
             }
         });
-        foldersView.setOnClickListener(new View.OnClickListener() {
+        downloaderView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 songsRoot.setVisibility(View.GONE);
                 playlistsRoot.setVisibility(View.GONE);
                 albumsRoot.setVisibility(View.GONE);
-                foldersRoot.setVisibility(View.VISIBLE);
+                downloaderRoot.setVisibility(View.VISIBLE);
             }
         });
 
@@ -376,8 +482,8 @@ public class OverlayPlayer extends Service {
 
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
-                int width = getResources().getDisplayMetrics().widthPixels / 2;
-                int height = getResources().getDisplayMetrics().heightPixels / 2;
+                int width = (getResources().getDisplayMetrics().widthPixels / 2);
+                int height = (getResources().getDisplayMetrics().heightPixels / 2);
 
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
@@ -392,10 +498,12 @@ public class OverlayPlayer extends Service {
                         return true;
 
                     case MotionEvent.ACTION_MOVE:
-                        params.x = initialX + (int) (motionEvent.getRawX() - initialTouchX);
-                        params.y = initialY + (int) (motionEvent.getRawY() - initialTouchY);
-                        Log.d("move", "params.x: " + params.x + " wid: " + width);
-                        Log.d("move", "params.y: " + params.y + " hei: " + height);
+                        params.x = (int) ((initialX + motionEvent.getRawX()) - initialTouchX);
+                        params.y = (int) ((initialY + motionEvent.getRawY()) - initialTouchY);
+                        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                        //params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                        //Log.d("move", "params.x: " + params.x + " wid: " + width);
+                        //Log.d("move", "params.y: " + params.y + " hei: " + height);
                         if(params.x > width){
                             params.x = width;
                             window.updateViewLayout(windowView, params);
@@ -423,7 +531,7 @@ public class OverlayPlayer extends Service {
                 return false;
             }
         });
-        tinyDrag.setOnTouchListener(new View.OnTouchListener() {
+        tinyRoot.setOnTouchListener(new View.OnTouchListener() {
             private int initialX;
             private int initialY;
             private float initialTouchX;
@@ -449,8 +557,9 @@ public class OverlayPlayer extends Service {
                         return true;
 
                     case MotionEvent.ACTION_MOVE:
-                        params.x = initialX + (int) (motionEvent.getRawX() - initialTouchX);
-                        params.y = initialY + (int) (motionEvent.getRawY() - initialTouchY);
+                        params.x = (int) ((initialX + motionEvent.getRawX()) - initialTouchX);
+                        params.y = (int) ((initialY + motionEvent.getRawY()) - initialTouchY);
+                        params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
                         if(params.x > width){
                             params.x = width;
                             window.updateViewLayout(windowView, params);
@@ -485,6 +594,7 @@ public class OverlayPlayer extends Service {
                 startActivity(intent);
             }
         });
+
         // TODO add the other 2 controls
 
         // CONTROLS
@@ -533,8 +643,15 @@ public class OverlayPlayer extends Service {
         minimizeImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tinyRoot.setVisibility(View.VISIBLE);
                 windowLayout.setVisibility(View.GONE);
+                Log.d("GETTING NOTIF SAVE TYPE", "onClick: " + isNotif + " | " + toLoadTinyPlayerType);
+                if(isNotif){
+                    NotificationCreator.init(OverlayPlayer.this);
+                    Toast.makeText(OverlayPlayer.this, "Overlay minimized to Notification.", Toast.LENGTH_SHORT).show();
+                } else if(!isNotif) {
+                    tinyRoot.setVisibility(View.VISIBLE);
+                    Toast.makeText(OverlayPlayer.this, "To maximize overlay, click on the song image.", Toast.LENGTH_SHORT).show();
+                }
             }
 
         });
@@ -570,35 +687,15 @@ public class OverlayPlayer extends Service {
                     if(isPlaying){
                         lastPos = InitialPlayer.getPos();
                         miniPlayPause.setImageResource(R.drawable.play);
-                        tinyPlayPause.setImageResource(R.drawable.play);
                         InitialPlayer.pause();
                         isPlaying = false;
                     } else {
                         miniPlayPause.setImageResource(R.drawable.pause);
-                        tinyPlayPause.setImageResource(R.drawable.pause);
-                        InitialPlayer.resume(OverlayPlayer.this);
-                        isPlaying = true;
-                    }
-                } else {
-                    //showToast(OverlayPlayer.this, toastLayout, toastText, "There are no songs playing!");
-                }
-            }
-        });
-        tinyPlayPause.setOnClickListener(new View.OnClickListener() {
-            int lastPos;
-            @Override
-            public void onClick(View view) {
-                if(InitialPlayer.getPlayer() != null){
-                    if(isPlaying){
-                        lastPos = InitialPlayer.getPos();
-                        miniPlayPause.setImageResource(R.drawable.play);
-                        tinyPlayPause.setImageResource(R.drawable.play);
-                        InitialPlayer.pause();
-                        isPlaying = false;
-                    } else {
-                        miniPlayPause.setImageResource(R.drawable.pause);
-                        tinyPlayPause.setImageResource(R.drawable.pause);
-                        InitialPlayer.resume(OverlayPlayer.this);
+                        try {
+                            InitialPlayer.resume(OverlayPlayer.this);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
                         isPlaying = true;
                     }
                 } else {
@@ -610,18 +707,11 @@ public class OverlayPlayer extends Service {
             @Override
             public void onClick(View view) {
                 if(InitialPlayer.getPlayer() != null){
-                    InitialPlayer.seekPrevious(OverlayPlayer.this);
-//                    if(!isPlaying){
-//                        InitialPlayer.pause();
-//                    }
-                }
-            }
-        });
-        tinyPrev.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(InitialPlayer.getPlayer() != null){
-                    InitialPlayer.seekPrevious(OverlayPlayer.this);
+                    try {
+                        InitialPlayer.seekPrevious(OverlayPlayer.this);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 //                    if(!isPlaying){
 //                        InitialPlayer.pause();
 //                    }
@@ -632,25 +722,17 @@ public class OverlayPlayer extends Service {
             @Override
             public void onClick(View view) {
                 if(InitialPlayer.getPlayer() != null){
-                    InitialPlayer.seekNext(OverlayPlayer.this);
+                    try {
+                        InitialPlayer.seekNext(OverlayPlayer.this);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 //                    if(!isPlaying){
 //                        InitialPlayer.pause();
 //                    }
                 }
             }
         });
-        tinyNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(InitialPlayer.getPlayer() != null){
-                    InitialPlayer.seekNext(OverlayPlayer.this);
-//                    if(!isPlaying){
-//                        InitialPlayer.pause();
-//                    }
-                }
-            }
-        });
-
         miniLoop.setOnClickListener(new View.OnClickListener() {
             int i = 0;
             @Override
@@ -737,6 +819,58 @@ public class OverlayPlayer extends Service {
             }
         });
 
+        tinyTogglerTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("toLoadTinyPlayerType: ", "Value: " + toLoadTinyPlayerType);
+                if(isNotif){
+                    tinyTogglerTxt.setText("Change to Notification");
+                    tinyTypeText.setText("Overlay");
+                    toSaveType = "Overlay";
+                    toSaveTxt = "Change to Notification";
+                    isNotif = false;
+                } else {
+                    tinyTogglerTxt.setText("Change to Overlay");
+                    tinyTypeText.setText("Notification");
+                    toSaveType = "Notification";
+                    toSaveTxt = "Change to Overlay";
+                    isNotif = true;
+                }
+                saveData();
+            }
+        });
+
+        rewriteCache.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                rewriteCache.setText("Re-writing cache...");
+                try {
+                    rewriteCache();
+                    Toast.makeText(OverlayPlayer.this, "Finished Re-writing cache.", Toast.LENGTH_SHORT).show();
+                    rewriteCache.setText("Re-write image cache");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        });
+
+        toAboutView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                aboutRoot.setVisibility(View.VISIBLE);
+                prevStatus = statusbarText.getText().toString();
+                statusbarText.setText("Tap on the blank area to close.");
+            }
+        });
+        aboutRoot.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                aboutRoot.setVisibility(View.GONE);
+                statusbarText.setText(prevStatus);
+            }
+        });
+
         // SONGS - CONTROLS
         shuffleImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -746,9 +880,7 @@ public class OverlayPlayer extends Service {
                 newPos = (int) (Math.random() * songUriArrayList.size());
                 Log.d("Shuffle", "Chosen: " + newPos);
                 InitialPlayer.play(OverlayPlayer.this, newPos); // will update
-                statusbarText.setText("Done!");
                 miniPlayPause.setImageResource(R.drawable.pause);
-                tinyPlayPause.setImageResource(R.drawable.pause);
                 isPlaying = true;
             }
         });
@@ -765,7 +897,6 @@ public class OverlayPlayer extends Service {
                 songRecyclerViewAdapter.notifyDataSetChanged();
                 songsRecyclerView.setVisibility(View.VISIBLE);
 
-                statusbarText.setText("Done!");
                 reloadImage.startAnimation(AnimationUtils.loadAnimation(OverlayPlayer.this, R.anim.reload_rotate));
 
                 new InitialPlayer().init(songUriArrayList);
@@ -784,6 +915,190 @@ public class OverlayPlayer extends Service {
             }
         });
 
+        // DOWNLOADER CONTROLS
+        downloaderHelp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startService(new Intent(OverlayPlayer.this, DownloaderGuide.class));
+            }
+        });
+
+        downloaderPaste.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ClipboardManager clipboardManager = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+                ClipData cd = clipboardManager.getPrimaryClip();
+                if(clipboardManager.hasPrimaryClip()){
+                    Log.d("ClipboardManager: ", "cd: " + cd);
+                    Log.d("ClipboardManager: ", "Has primary clip.");
+                }
+                if(cd != null){
+                    Log.d("Clipboard cd: ", "m: " + cd);
+                    Log.d("Clipboard Amt: ", "m: " + cd.getItemCount());
+                    Log.d("Clipboard indx: ", "m: " + cd.getItemAt(0));
+                    ClipData.Item item = cd.getItemAt(0);
+                    downloaderURLText.setText(item.getText().toString());
+                    songURL = item.getText().toString();
+                } else {
+                    Toast.makeText(OverlayPlayer.this, "Nothing to paste!", Toast.LENGTH_SHORT).show();
+                    Log.d("FAIL Clipboard cd: ", "m: " + cd);
+                }
+            }
+        });
+
+        downloaderKB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                downloaderURLText.setCursorVisible(false);
+                params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                window.updateViewLayout(windowView, params);
+                Toast.makeText(OverlayPlayer.this, "Keyboard closed.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        downloaderURLText.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                //downloaderURLText.setCursorVisible(true);
+                params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
+                window.updateViewLayout(windowView, params);
+                return false;
+            }
+        });
+        downloaderURLText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean b) {
+                Log.d("URLTEXT", "GETTING FOCUS CHANGE...");
+                if(!b){
+                    Log.d("URLTEXT", "FOCUS IS CHANGED!");
+                    params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                    window.updateViewLayout(windowView, params);
+                } else {
+                    Log.d("URLTEXT", "FOCUS NOT CHANGED.");
+                }
+            }
+
+
+        });
+        downloaderURLText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
+                if (i == EditorInfo.IME_ACTION_SEARCH
+                        || i == EditorInfo.IME_ACTION_DONE
+                        || keyEvent.getAction() == KeyEvent.ACTION_DOWN
+                        && keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+
+                    Log.d("onEditorAction: ", "ACTION FINISHED.");
+                    params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+                    window.updateViewLayout(windowView, params);
+
+                    return true;
+                }
+                // Return true if you have consumed the action, else false.
+                return false;
+            }
+        });
+
+        downloaderSearch.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("StaticFieldLeak")
+            @Override
+            public void onClick(View view) {
+                downloaderBuffer.setVisibility(View.VISIBLE);
+                songURL = downloaderURLText.getText().toString();
+                Log.d("Search: ", "url: " + songURL);
+                if(Patterns.WEB_URL.matcher(songURL).matches() && songURL != null){
+                    new YouTubeExtractor(OverlayPlayer.this){
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        protected void onExtractionComplete(@Nullable SparseArray<YtFile> ytFiles, @Nullable VideoMeta videoMeta) {
+                            if (ytFiles != null) {
+
+                                int itag = ytFiles.keyAt(0);
+                                YtFile ytFile = ytFiles.get(itag);
+
+                                if (ytFile.getFormat().getHeight() == -1 || ytFile.getFormat().getHeight() >= 360) {
+                                    Log.d("onExtractionComplete: ", "Title: " + videoMeta.getTitle());
+                                    Log.d("onExtractionComplete: ", "Author: " + videoMeta.getAuthor());
+                                    Log.d("onExtractionComplete: ", "Views: " + videoMeta.getViewCount());
+                                    Log.d("onExtractionComplete: ", "Thumb: " + videoMeta.getThumbUrl());
+                                }
+
+                                String downloadUrl = ytFiles.get(itag).getUrl();
+                                dlURL = downloadUrl;
+                                dlNameStr = videoMeta.getTitle();
+
+                                downloaderBuffer.setVisibility(View.GONE);
+                                downloaderInfo.setVisibility(View.VISIBLE);
+
+                                dlName.setText("Name: " + videoMeta.getTitle());
+                                dlAuthor.setText("Author: " + videoMeta.getAuthor());
+                                dlViews.setText("Views: " + String.valueOf(videoMeta.getViewCount()));
+//                                Picasso.get().load(videoMeta.getThumbUrl()).error(R.drawable.song_icon).into(dlThumb, new Callback() {
+//                                    @Override
+//                                    public void onSuccess() {
+//                                        Log.d("onSuccess: ", "LOADED DL PIC // PICASSO");
+//                                    }
+//
+//                                    @Override
+//                                    public void onError(Exception e) {
+//                                        Log.d("onSuccess: ", "FAILED TO LOAD PIC.");
+//
+//                                    }
+//                                });
+                                Toast.makeText(OverlayPlayer.this, "Found " + videoMeta.getTitle() , Toast.LENGTH_SHORT).show();
+
+                                Log.d("Download: ", "URL: " + downloadUrl);
+                            } else {
+                                Toast.makeText(OverlayPlayer.this, "The song could not be found!", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    }.extract(songURL);
+                } else {
+                    Toast.makeText(OverlayPlayer.this, "Invalid link!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        downloaderDL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(dlURL != null){
+                    Uri uri = Uri.parse(dlURL);
+                    DownloadManager.Request request = new DownloadManager.Request(uri);
+                    request.setTitle(dlNameStr);
+
+                    request.allowScanningByMediaScanner();
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, dlNameStr + ".mp3");
+
+                    DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+                    manager.enqueue(request);
+
+                    Toast.makeText(OverlayPlayer.this, "Downloading...", Toast.LENGTH_SHORT).show();
+                    downloaderURLText.setText("");
+                    dlName.setText("");
+                    dlAuthor.setText("");
+                    dlViews.setText("");
+                    downloaderInfo.setVisibility(View.GONE);
+                    Toast.makeText(OverlayPlayer.this, "Go to Songs -> Reload, find the song and enjoy.", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(OverlayPlayer.this, "Cannot download an empty url!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        // ABOUT
+
+
+        /**
+         * WRITING CACHE
+         * */
+        try {
+            writeCache();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     // SONGS METHODS
@@ -797,7 +1112,8 @@ public class OverlayPlayer extends Service {
                 MediaStore.Audio.Media.DURATION,
                 MediaStore.Audio.Media.DATA,
                 MediaStore.Audio.Media.ARTIST,
-                MediaStore.Audio.Media.DISPLAY_NAME
+                MediaStore.Audio.Media.DISPLAY_NAME,
+                MediaStore.Audio.Media._ID
         };
 
         String selection = MediaStore.Audio.Media.IS_MUSIC + "=1";
@@ -815,11 +1131,17 @@ public class OverlayPlayer extends Service {
                 int duration = cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION));
                 String path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA));
                 String artist = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST));
-                //String ogFileName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
+                String ogName = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME));
+                long songId = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID));
 
-                SongsConstructor musicModel = new SongsConstructor(path, title, artist, album, duration);
+
+                Uri songCover = Uri.parse("content://media/external/audio/albumart");
+                Uri uriSongCover = ContentUris.withAppendedId(songCover, songId);
+                String ogFileName = ogName.split(".mp3")[0];
+
+                SongsConstructor musicModel = new SongsConstructor(path, title, artist, album, ogFileName, duration, uriSongCover);
                 tempAudioList.add(musicModel); // this adds the "files" with metadata
-                Log.d("getAllSongs()", "path: " + path);
+                //Log.d("getAllSongs()", "path: " + path);
                 //Log.d("ARRAYLIST", "getAllSongs: " + arrayList);
             }
             cursor.close();
@@ -837,7 +1159,6 @@ public class OverlayPlayer extends Service {
             InitialPlayer.play(context, position); // will update
         }
         miniPlayPause.setImageResource(R.drawable.pause);
-        tinyPlayPause.setImageResource(R.drawable.pause);
         isPlaying = true;
     }
 
@@ -925,7 +1246,7 @@ public class OverlayPlayer extends Service {
     }
 
     // MINI PLAYER METHODS
-    public static void updateMiniPlayer(){
+    public static void updateMiniPlayer() throws IOException {
 
         miniSongTitle.setText(InitialPlayer.getArrayList().get(InitialPlayer.getPos()).getTitle());
         miniSongArtist.setText(InitialPlayer.getArrayList().get(InitialPlayer.getPos()).getArtist());
@@ -935,20 +1256,30 @@ public class OverlayPlayer extends Service {
         tinySongTitle.setText(InitialPlayer.getArrayList().get(InitialPlayer.getPos()).getTitle());
 
         miniPlayPause.setImageResource(R.drawable.pause);
-        tinyPlayPause.setImageResource(R.drawable.pause);
 
-        Bitmap bitmap = Utils.getAlbumArt(InitialPlayer.getArrayList().get(InitialPlayer.getPos()).getPath());
-        if(bitmap != null) {
-            //Bitmap bitmap = BitmapFactory.decodeByteArray(image, 0, image.length);
-            miniImage.setImageBitmap(bitmap);
-            tinyArtwork.setImageBitmap(bitmap);
-            miniPlayer.setBackgroundColor(Utils.getDominantColor(bitmap));
-            //tinyRoot.setBackgroundColor(getDominantColor(bitmap));
+//        Uri songArt = Utils.getAlbumArt(InitialPlayer.getPos());
+//        if(songArt != null){
+//            miniImage.setImageURI(songArt);
+//            tinyArtwork.setImageURI(songArt);
+//            miniPlayer.setBackgroundColor(Utils.getDominantColor(songArt, thisContext));
+//            //tinyRoot.setBackgroundColor(getDominantColor(bitmap));
+//            Log.d("onBindViewHolder()", "Loading Artwork.");
+//        } else {
+//            miniImage.setImageResource(R.drawable.song_image);
+//            tinyArtwork.setImageResource(R.drawable.song_image);
+//            miniPlayer.setBackgroundColor(Color.rgb(26, 26, 26));
+//            Log.d("onBindViewHolder()", "Loading -Placeholder.");
+//        }
+
+
+        if (cacheDir != null) {
+            File filePath = new File(cacheDir + "/" + songUriArrayList.get(InitialPlayer.getPos()).getOgName() + ".png");
+            Picasso.get().load(filePath).error(R.drawable.song_image).into(miniImage);
+            Picasso.get().load(filePath).error(R.drawable.song_image).into(tinyArtwork);
             Log.d("onBindViewHolder()", "Loading Artwork.");
         } else {
             miniImage.setImageResource(R.drawable.song_image);
             tinyArtwork.setImageResource(R.drawable.song_image);
-            miniPlayer.setBackgroundColor(Color.rgb(26, 26, 26));
             Log.d("onBindViewHolder()", "Loading -Placeholder.");
         }
 
@@ -977,14 +1308,29 @@ public class OverlayPlayer extends Service {
 
     }
 
+//    private void createChannel(){
+//        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+//            NotificationChannel notifChannel = new NotificationChannel(
+//                    NotificationCreator.CHANNEL_ID,
+//                    "MP3 Player",
+//                    NotificationManager.IMPORTANCE_HIGH);
+//            notifManager = getSystemService(NotificationManager.class);
+//            if(notifManager != null){
+//                notifManager.createNotificationChannel(notifChannel);
+//            }
+//        }
+//    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
         //showToast(this, toastLayout, toastText, "Thank you for using this app!");
         saveData();
+        isPlaying = false;
         if(windowView != null){
             window.removeView(windowView);
         }
+        notifDestroy();
         barVisualizer.release();
         InitialPlayer.stop();
         Toast.makeText(this, "Thank you for using this app!", Toast.LENGTH_SHORT).show();
@@ -1019,6 +1365,12 @@ public class OverlayPlayer extends Service {
         editor.putFloat(toSaveOpacityString, toSaveOpacity);
         editor.putInt(toSaveSeekbarPosString, opacitySeekbar.getProgress());
 
+        editor.putString(toSaveTinyPlayerTypeString, toSaveType);
+        editor.putString(toSaveTinyChangeString, toSaveTxt);
+
+        Log.d("saveData: ", "SAVE TYPE: " + toSaveType);
+        Log.d("saveData: ", "SAVE TXT: " + toSaveTxt);
+
         editor.apply();
         editor.commit();
     }
@@ -1033,5 +1385,175 @@ public class OverlayPlayer extends Service {
 
         toLoadOpacity = sharedPreferences.getFloat(toSaveOpacityString, 1);
         toLoadSeekbarPos = sharedPreferences.getInt(toSaveSeekbarPosString, 50);
+
+        toLoadTinyPlayerType = sharedPreferences.getString(toSaveTinyPlayerTypeString, "Notification");
+        toLoadTinyChangeTxt = sharedPreferences.getString(toSaveTinyChangeString, "Change to Overlay");
+
+        Log.d("loadData: ", "LOAD TYPE: " + toLoadTinyPlayerType);
+        Log.d("loadData: ", "LOAD TXT: " + toLoadTinyChangeTxt);
     }
-}
+
+    private void writeCache() throws FileNotFoundException {
+        File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "mp3Player_imgCache");
+        cacheDir = String.valueOf(dir);
+        if(!dir.exists()){
+            dir.mkdir();
+            Toast.makeText(thisContext, "Made cache directory. (Pictures)", Toast.LENGTH_SHORT).show();
+            Log.d("writeCache: ", "DIR: " + dir);
+            if(songUriArrayList != null){
+                for(int i = 0; i < songUriArrayList.size(); i++) {
+                    Bitmap bitmap = Utils.getAlbumArt(songUriArrayList.get(i).getPath());
+                    if(bitmap != null){
+                        //Log.d("GET_SONG+TESTUGQ9RQ3RR", "loc: " + songUriArrayList.get(i).getPath());
+                        File file = new File(dir, songUriArrayList.get(i).getOgName() + ".png");
+                        outputStream = new FileOutputStream(file);
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                        Log.d("writeCache", "WROTE " + file);
+                    }
+                }
+            }
+        }
+    }
+
+    private void rewriteCache() throws FileNotFoundException {
+        File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "mp3Player_imgCache");
+        cacheDir = String.valueOf(dir);
+        if(dir != null){
+            for(int i = 0; i < songUriArrayList.size(); i++) {
+                Bitmap bitmap = Utils.getAlbumArt(songUriArrayList.get(i).getPath());
+                if(bitmap != null){
+                    File file = new File(dir, songUriArrayList.get(i).getOgName() + ".png");
+                    outputStream = new FileOutputStream(file);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+                    Log.d("rewriteCache", "WROTE " + file);
+                }
+            }
+        }
+    }
+
+    // NOTIFICATIONS
+
+    // ?
+    // DO NOT USE UNTIL FUTURE UPDATES.
+    // this code is either bugged or broken. un-codeblock at your risk.
+    //
+    //
+    // this code initializes the notification
+    // NotificationCreator.init(MainActivity.this, InitialPlayer.getArrayList(), InitialPlayer.getPos(), InitialPlayer.getPlayer().isPlaying());
+
+    // vvv THIS IS ONLY FOR v1.3 OVERLAY TOGGLER.
+    private void createChannel(){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
+            NotificationChannel notifChannel = new NotificationChannel(
+                    NotificationCreator.CHANNEL_ID,
+                    "MP3 Player",
+                    NotificationManager.IMPORTANCE_HIGH);
+            notifManager = getSystemService(NotificationManager.class);
+            if(notifManager != null){
+                notifManager.createNotificationChannel(notifChannel);
+            }
+        }
+    }
+    BroadcastReceiver receiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getExtras().getString("actionName");
+            switch(action){
+                case NotificationCreator.TOGGLE:
+                    Log.d("RECEIVED INTENT: ", "TOGGLE OVERLAY");
+                    windowLayout.setVisibility(View.VISIBLE);
+                    Toast.makeText(context, "Overlay is visible!", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+//    //
+//    BroadcastReceiver receiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            String action = intent.getExtras().getString("actionName");
+//            //Log.d("BEFORE onReceive: CHECKING PLAYER POSITION", "pos: " + InitialPlayer.getPos());
+//            Log.d("onReceive: ", "Action: " + action);
+//            switch (action){
+//                case NotificationCreator.SEEK_PREV:
+//                    Log.d("NOTIF RECEIVE", "SEEK PREV");
+//                    onSongPrev();
+//                case NotificationCreator.PLAY:
+//                    Log.d("NOTIF RECEIVE", "PLAY");
+//                    ///onSongPlay();
+//                case NotificationCreator.SEEK_NEXT:
+//                    Log.d("NOTIF RECEIVE", "SEEK NEXT");
+//                    onSongNext();
+//                case NotificationCreator.CANCEL:
+//                    Log.d("NOTIF RECEIVE", "CANCEL");
+//                    onClose();
+//
+//            }
+//            //Log.d("AFTER onReceive: CHECKING PLAYER POSITION", "pos: " + InitialPlayer.getPos());
+//
+//        }
+//    };
+//
+//    @Override
+//    public void onSongPrev() {
+//        Log.d("NOTIFICATION ACTION", "onSongPrev");
+////        if(InitialPlayer.getPlayer() != null){
+////            try {
+////                InitialPlayer.seekPrevious(OverlayPlayer.this);
+////            } catch (IOException e) {
+////                e.printStackTrace();
+////            }
+////        }
+//    }
+//
+//    @Override
+//    public void onSongPlay() {
+//        Log.d("NOTIFICATION ACTION", "onSongPlay");
+////        if(InitialPlayer.getPlayer() != null){
+////            if(isPlaying){
+////                miniPlayPause.setImageResource(R.drawable.play);
+////                tinyPlayPause.setImageResource(R.drawable.play);
+////                InitialPlayer.pause();
+////                isPlaying = false;
+////            } else {
+////                miniPlayPause.setImageResource(R.drawable.pause);
+////                tinyPlayPause.setImageResource(R.drawable.pause);
+////                try {
+////                    InitialPlayer.resume(OverlayPlayer.this);
+////                } catch (IOException e) {
+////                    e.printStackTrace();
+////                }
+////                isPlaying = true;
+////            }
+////        }
+//    }
+//
+//    @Override
+//    public void onSongNext() {
+//        Log.d("NOTIFICATION ACTION", "onSongNext");
+////        if(InitialPlayer.getPlayer() != null){
+////            try {
+////                InitialPlayer.seekNext(OverlayPlayer.this);
+////            } catch (IOException e) {
+////                e.printStackTrace();
+////            }
+////        }
+//    }
+//
+//    @Override
+//    public void onMaximize() {
+//        notifDestroy();
+//        //windowLayout.setVisibility(View.VISIBLE);
+//    }
+//
+//    @Override
+//    public void onClose() {
+//        //onDestroy();
+//    }
+//
+//    //
+    private void notifDestroy(){
+        notifManager.cancelAll();
+        unregisterReceiver(receiver);
+    }
+
+ }
