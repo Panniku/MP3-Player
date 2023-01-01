@@ -5,6 +5,7 @@
         >
 
     <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
@@ -18,6 +19,7 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.MP3Player.Light"
             >
+
         <activity
                 android:name=".OverlaySongsSelector"
                 android:exported="true"
@@ -47,10 +49,13 @@
                 android:exported="false"
                 />
         <service
-                android:name=".Overlay.WindowToast"
+                android:name=".Overlay.DownloaderGuide"
                 android:enabled="true"
                 android:exported="false"
                 />
+
+        <receiver android:name=".Notification.NotificationActions"/>
+<!--        <service android:name=".Notification.RecentServiceClear"/>-->
     </application>
 
 </manifest>
