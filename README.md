@@ -41,4 +41,5 @@ Overlay based Song Player for Android 6 and above
 - This can be fixed by having at least one song with image metadata, which then the application can register
 
 ## Bugs
-- If you come across any bug, please report to me at my discord `Pannikuパン肉#5360`!
+### 1. Visualizer wont work on Android 7
+- If you come across any more bug, please report to me at my discord `Pannikuパン肉#5360`!
