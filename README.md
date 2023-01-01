@@ -1,5 +1,5 @@
 # MP3 Player
-Overlay based Android 4.4 themed(?) song player for Android 6+
+Overlay based Song Player for Android 6 and above
 
 ## Usage / How to set up 
 1. Install the app. Once installed, open it
