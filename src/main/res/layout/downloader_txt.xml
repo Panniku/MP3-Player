@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+    <TextView
+            android:id="@+id/dlHeader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:text="@string/dl_header"
+            />
+
+    <!--    -->
+
+    <RelativeLayout
+            android:id="@+id/abtpst"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/dlHeader"
+            >
+
+        <ImageView
+                android:id="@+id/dlPaste"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/paste"
+                />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_toRightOf="@id/dlPaste"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:text="@string/abt_pst"
+                />
+
+    </RelativeLayout>
+
+    <!--    -->
+
+    <RelativeLayout
+            android:id="@+id/abtkb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/abtpst"
+            >
+
+        <ImageView
+                android:id="@+id/dlKb"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/keyboard_hide"
+                />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_toRightOf="@id/dlKb"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:text="@string/abt_kb"
+                />
+
+    </RelativeLayout>
+
+    <!--    -->
+
+    <RelativeLayout
+            android:id="@+id/abtsrc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/abtkb"
+            >
+
+        <ImageView
+                android:id="@+id/dlsrc"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/search"
+                />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_toRightOf="@id/dlsrc"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:text="@string/abt_src"
+                />
+
+    </RelativeLayout>
+
+    <!--    -->
+
+    <RelativeLayout
+            android:id="@+id/abtdl"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/abtsrc"
+            >
+
+        <ImageView
+                android:id="@+id/dldl"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/downloader_icon"
+                />
+
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_toRightOf="@id/dldl"
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:text="@string/abt_dl"
+                />
+
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/main_drawerLayout"
+        xmlns:tools="http://schemas.android.com/tools"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:fitsSystemWindows="true"
         tools:context=".MainActivity"
         android:layout_width="match_parent"
@@ -11,101 +11,51 @@
 
     <RelativeLayout
             android:id="@+id/overlayTinyRoot"
-            android:layout_width="180dp"
-            android:layout_height="45dp"
-            android:background="@color/black"
-            android:alpha="0.8"
+            android:layout_width="170dp"
+            android:layout_height="24dp"
+            android:background="@drawable/tiny_custombg"
+            android:alpha="1"
             android:visibility="gone">
 
-        <ImageView
-                android:id="@+id/overlayTinyDrag"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_alignParentStart="true"
-                android:src="@drawable/tiny_drag"
-                />
 
-        <ImageView
-                android:id="@+id/overlayTinyArtwork"
-                android:layout_width="45dp"
-                android:layout_height="45dp"
-                android:layout_toEndOf="@id/overlayTinyDrag"
-                android:src="@drawable/song_image"
-                />
-
-        <TextView
-                android:id="@+id/overlayTinySongTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="1dp"
-                android:layout_toEndOf="@+id/overlayTinyArtwork"
-                android:layout_alignParentEnd="true"
-                android:paddingStart="1dp"
-                android:text="Nothing is playing!"
-                android:textSize="12sp"
-                android:textColor="@color/white"
-                android:maxLines="1"
-                android:marqueeRepeatLimit="marquee_forever"
-                android:ellipsize="marquee"
-                />
-
-        <LinearLayout
+        <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_toEndOf="@id/overlayTinyArtwork"
-                android:layout_below="@id/overlayTinySongTitle"
-                android:layout_alignParentBottom="true"
-                android:layout_marginStart="1dp"
-                android:layout_marginTop="2dp"
-                android:weightSum="3"
-                >
+                android:layout_height="match_parent"
+                android:layout_margin="0dp">
 
             <ImageView
-                    android:id="@+id/overlayTinySeekPrev"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/skip_previous"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_weight="1"
+                    android:id="@+id/overlayTinyArtwork"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/song_image"
                     />
 
-
-            <ImageView
-                    android:id="@+id/overlayTinyPlayPause"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/play"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_weight="1"
+            <TextView
+                    android:id="@+id/overlayTinySongTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="1dp"
+                    android:layout_toEndOf="@+id/overlayTinyArtwork"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="Nothing is playing!"
+                    android:textSize="14sp"
+                    android:textColor="@color/white"
+                    android:maxLines="1"
+                    android:marqueeRepeatLimit="marquee_forever"
+                    android:ellipsize="marquee"
                     />
-
-            <ImageView
-                    android:id="@+id/overlayTinySeekNext"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:src="@drawable/skip_next"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginEnd="5dp"
-                    android:layout_marginTop="5dp"
-                    android:layout_marginStart="5dp"
-                    android:layout_weight="1"
-                    />
+        </RelativeLayout>
 
 
-        </LinearLayout>
+
     </RelativeLayout>
 
     <RelativeLayout
             android:id="@+id/overlayExpandedRoot"
             android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:background="@color/white"
+            android:background="@color/black"
             android:visibility="visible"
             >
 
@@ -113,7 +63,7 @@
         <RelativeLayout
                 android:id="@+id/overlayControls"
                 android:layout_width="match_parent"
-                android:layout_height="25dp"
+                android:layout_height="24dp"
                 >
 
             <RelativeLayout
@@ -124,19 +74,8 @@
                     android:layout_marginTop="2dp"
                     android:layout_centerVertical="true"
                     android:background="@drawable/visualizer_holder"
-                    android:backgroundTint="#000000"
+                    android:backgroundTint="#FFFFFF"
                     >
-
-                <ImageView
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:layout_marginStart="2dp"
-                        android:layout_marginEnd="2dp"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="2dp"
-                        android:background="@color/transparent_dark"
-                        android:backgroundTint="#CCFFFFFF"
-                        />
 
                 <com.panniku.mp3player.Visualizer.BarVisualizer
                         android:id="@+id/overlayBarVisualizer"
@@ -145,7 +84,8 @@
                         android:layout_marginStart="2dp"
                         android:layout_marginEnd="2dp"
                         android:layout_marginTop="2dp"
-                        android:layout_marginBottom="2dp"
+                        android:layout_marginBottom="2.5dp"
+                        android:background="@color/transparent_dark"
                         />
 
             </RelativeLayout>
@@ -153,62 +93,54 @@
             <TextView
                     android:id="@+id/overlayTitle"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
                     android:layout_marginStart="2dp"
                     android:layout_toEndOf="@id/overlayVisualizerHolder"
                     android:layout_centerVertical="true"
                     android:text="MP3 Player"
                     android:textSize="16sp"
-                    android:textColor="@color/black"
+                    android:textColor="@color/white"
                     />
 
             <ImageView
                     android:id="@+id/overlayToMiniplayer"
-                    android:layout_width="20dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_toEndOf="@+id/overlayTitle"
                     android:layout_marginStart="5dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="2dp"
-                    android:layout_marginBottom="2dp"
+
                     android:src="@drawable/to_miniplayer"
-                    android:tint="#80000000"
+                    android:tint="@color/white"
                     />
 
             <ImageView
                     android:id="@+id/overlayClose"
-                    android:layout_width="20dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginTop="2dp"
                     android:layout_marginEnd="2dp"
-                    android:layout_marginBottom="2dp"
                     android:src="@drawable/close_window"
                     />
 
             <ImageView
                     android:id="@+id/overlayMinimize"
-                    android:layout_width="20dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_toStartOf="@+id/overlayClose"
-                    android:layout_marginTop="2dp"
                     android:layout_marginEnd="2dp"
-                    android:layout_marginBottom="2dp"
                     android:background="@android:color/transparent"
                     android:src="@drawable/minimize_window"
                     />
 
             <ImageView
                     android:id="@+id/overlaySettings"
-                    android:layout_width="20dp"
-                    android:layout_height="match_parent"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:layout_toStartOf="@+id/overlayMinimize"
-                    android:layout_marginTop="2dp"
                     android:layout_marginEnd="2dp"
-                    android:layout_marginBottom="2dp"
                     android:background="@android:color/transparent"
                     android:src="@drawable/settings_window"
-                    android:tint="#80000000"
+                    android:tint="@color/white"
                     />
 
         </RelativeLayout>
@@ -229,7 +161,7 @@
                     android:layout_marginEnd="2dp"
                     android:layout_marginBottom="2dp"
                     android:layout_marginTop="2dp"
-                    android:background="#b593c9"
+                    android:background="@color/purple_darker"
                     android:visibility="gone"
                     >
 
@@ -238,7 +170,7 @@
                         android:layout_height="match_parent"
                         android:layout_alignParentTop="true"
                         android:layout_alignBottom="@+id/overlayMiniControls"
-                        android:background="#33FFFFFF"
+                        android:background="#33000000"
                         />
 
                 <ImageView
@@ -307,7 +239,7 @@
                 <RelativeLayout
                         android:id="@+id/overlayMiniExpandedControls"
                         android:layout_width="match_parent"
-                        android:layout_height="0dp"
+                        android:layout_height="00dp"
                         android:layout_below="@id/overlayMiniSongArtwork"
                         android:visibility="visible"
                         >
@@ -316,8 +248,8 @@
                             android:id="@+id/overlayMiniSeekBar"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:thumbTint="@color/white"
-                            android:progressTint="@color/gray"
+                            android:thumbTint="@color/purple_norm"
+                            android:progressTint="@color/purple_norm"
                             />
 
                     <TextView
@@ -438,7 +370,7 @@
                         android:layout_height="40dp"
                         android:weightSum="4"
                         android:orientation="horizontal"
-                        android:background="#b593c9"
+                        android:background="@color/purple_darker"
                         >
 
                     <RelativeLayout
@@ -488,7 +420,7 @@
                     </RelativeLayout>
 
                     <RelativeLayout
-                            android:id="@+id/overlayExpandedFoldersView"
+                            android:id="@+id/overlayExpandedDownloaderView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:layout_weight="1"
@@ -497,7 +429,7 @@
                         <ImageView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:src="@drawable/folders_icon"
+                                android:src="@drawable/downloader_icon"
                                 android:layout_centerInParent="true"
                                 />
                     </RelativeLayout>
@@ -509,19 +441,22 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_below="@id/overlayExpandedViewTab"
-                        android:background="#c4a7d6">
+                        android:background="@color/purple_darker"
+                        android:backgroundTint="@color/transparent_dark"
+                        >
 
                     <RelativeLayout
                             android:id="@+id/overlaySongsRoot"
                             android:layout_width="250dp"
                             android:layout_height="200dp"
-                            android:visibility="visible">
+                            android:visibility="visible"
+                            >
 
                         <RelativeLayout
                                 android:id="@+id/overlaySongsControls"
                                 android:layout_width="match_parent"
                                 android:layout_height="20dp"
-                                android:background="#b593c9"
+                                android:background="@color/purple_darker"
                                 >
 
                             <TextView
@@ -529,6 +464,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="20dp"
                                     android:text="Random"
+                                    android:textColor="@color/white"
                                     android:paddingStart="5dp"
                                     android:textSize="14sp"
                                     />
@@ -605,7 +541,7 @@
                                 android:id="@+id/overlayPlaylistsControls"
                                 android:layout_width="match_parent"
                                 android:layout_height="20dp"
-                                android:background="#b593c9"
+                                android:background="@color/purple_darker"
                                 >
 
                             <TextView
@@ -615,6 +551,7 @@
                                     android:text="Add new list"
                                     android:paddingStart="5dp"
                                     android:textSize="14sp"
+                                    android:textColor="@color/white"
                                     />
 
                         </RelativeLayout>
@@ -630,32 +567,180 @@
                     </RelativeLayout> <!-- PLAYLISTS VIEW -->
                     <RelativeLayout
                             android:id="@+id/overlayAlbumsRoot"
-                            android:layout_width="240dp"
+                            android:layout_width="250dp"
                             android:layout_height="200dp"
-                            android:visibility="gone">
+                            android:visibility="gone"
+                            >
 
                         <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="Albums"
                                 android:textSize="20sp"
-                                android:layout_centerInParent="true"/>
+                                android:layout_centerInParent="true"
+                                />
 
                     </RelativeLayout> <!-- ALBUMS VIEW -->
                     <RelativeLayout
-                            android:id="@+id/overlayFoldersRoot"
-                            android:layout_width="240dp"
+                            android:id="@+id/overlayDownloaderRoot"
+                            android:layout_width="250dp"
                             android:layout_height="200dp"
-                            android:visibility="gone">
+                            android:visibility="gone"
+                            >
 
-                        <TextView
-                                android:layout_width="wrap_content"
+                        <RelativeLayout
+                                android:id="@+id/overlayDownloaderBuffer"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:visibility="gone"
+                                >
+
+                            <ProgressBar
+                                    android:layout_width="35dp"
+                                    android:layout_height="35dp"
+                                    android:layout_centerInParent="true"
+                                    />
+
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                                android:id="@+id/overlayDownloaderControls"
+                                android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:text="Folders"
-                                android:textSize="20sp"
-                                android:layout_centerInParent="true"/>
+                                android:layout_alignParentTop="true">
 
-                    </RelativeLayout> <!-- FOLDERS VIEW -->
+                            <TextView
+                                    android:id="@+id/entertxt"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Enter Youtube Link: "
+                                    android:textColor="@color/white"
+                                    android:textSize="14sp"
+                                    />
+
+                            <ImageView
+                                    android:id="@+id/downloaderHelp"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_marginRight="2dp"
+                                    android:layout_toLeftOf="@id/downloaderPasteText"
+                                    android:src="@drawable/help"
+                                    />
+
+                            <ImageView
+                                    android:id="@+id/downloaderPasteText"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_marginRight="2dp"
+                                    android:layout_toLeftOf="@id/downloaderToggleKB"
+                                    android:src="@drawable/paste"
+                                    />
+
+                            <ImageView
+                                    android:id="@+id/downloaderToggleKB"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_alignParentRight="true"
+                                    android:src="@drawable/keyboard_hide"
+                                    />
+
+                        </RelativeLayout>
+
+                        <EditText
+                                android:id="@+id/downloaderURLText"
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:layout_below="@id/overlayDownloaderControls"
+                                android:text=""
+                                android:textColor="@color/white"
+                                android:textSize="14sp"
+                                android:imeOptions="actionDone"
+                                android:inputType="text"
+                                android:hint="https://www.youtube.com/watch?v=yESFRV-FKuI"
+                                android:textColorHint="@color/gray"
+                                />
+
+                        <ImageView
+                                android:id="@+id/downloaderSearchURL"
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:layout_below="@id/downloaderURLText"
+                                android:src="@drawable/search"
+                                />
+
+                        <RelativeLayout
+                                android:id="@+id/downloaderInfo"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_below="@id/downloaderSearchURL"
+                                android:visibility="gone"
+                                >
+
+
+                            <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_alignParentTop="true"
+                                    android:orientation="vertical"
+                                    android:layout_toStartOf="@+id/dlThumb"
+                                    >
+
+                                <TextView
+                                        android:id="@+id/dlName"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text=""
+                                        android:textColor="@color/white"
+                                        android:textSize="14sp"
+                                        android:lines="1"
+                                        android:ellipsize="marquee"
+                                        />
+
+                                <TextView
+                                        android:id="@+id/dlAuthor"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text=""
+                                        android:textColor="@color/white"
+                                        android:textSize="14sp"
+                                        android:lines="1"
+                                        android:ellipsize="marquee"
+                                        />
+
+                                <TextView
+                                        android:id="@+id/dlViews"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text=""
+                                        android:textColor="@color/white"
+                                        android:textSize="14sp"
+                                        android:lines="1"
+                                        android:ellipsize="marquee"
+                                        />
+
+                            </LinearLayout>
+
+                            <ImageView
+                                    android:id="@+id/dlThumb"
+                                    android:layout_width="64dp"
+                                    android:layout_height="36dp"
+                                    android:layout_alignParentRight="true"
+                                    android:src="@drawable/song_icon"
+                                    android:visibility="gone"
+                                    />
+                            <!-- ^^^ DO NOT USE UNTIL FUTURE. -->
+
+                            <ImageView
+                                    android:id="@+id/downloaderDLURL"
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:layout_alignParentBottom="true"
+                                    android:src="@drawable/downloader_icon"
+                                    />
+
+                        </RelativeLayout>
+
+                    </RelativeLayout> <!-- DOWNLOADER VIEW -->
                 </RelativeLayout>
             </RelativeLayout>
 
@@ -674,7 +759,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="40dp"
                         android:orientation="horizontal"
-                        android:background="#b593c9"
+                        android:background="@color/purple_darker"
                         >
 
                     <RelativeLayout
@@ -766,15 +851,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_below="@id/overlaySecondaryViewControls"
-                        android:background="#c4a7d6"
-                        >
+                        android:background="#1B1923">
 
                     <androidx.recyclerview.widget.RecyclerView
                             android:id="@+id/overlaySecondaryRecyclerView"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            tools:listitem="@layout/song_list_item"
-                            />
+                            tools:listitem="@layout/song_list_item"/>
 
                 </RelativeLayout>
 
@@ -788,36 +871,195 @@
                     android:layout_marginStart="2dp"
                     android:layout_marginEnd="2dp"
                     android:layout_marginBottom="2dp"
-                    android:background="#CC000000"
-                    android:visibility="gone">
+                    android:background="@color/black"
+                    android:visibility="visible"
+                    >
 
-                <TextView
-                        android:id="@+id/overlaySettingsOpacityText"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="2dp"
-                        android:layout_marginEnd="2dp"
-                        android:layout_marginTop="2dp"
-                        android:text="Window Transparency: "
-                        />
-
-                <TextView
-                        android:id="@+id/overlaySettingsOpacityTextCounter"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_toEndOf="@+id/overlaySettingsOpacityText"
-                        android:layout_marginEnd="2dp"
-                        android:layout_marginTop="2dp"
-                        android:text="100"/>
-
-                <SeekBar
-                        android:id="@+id/overlaySettingsOpacitySeekbar"
+                <RelativeLayout
+                        android:id="@+id/settingTransparency"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        android:layout_below="@+id/overlaySettingsOpacityText"
-                        android:min="50"
-                        android:max="100"/>
+                        >
+
+                    <TextView
+                            android:id="@+id/overlaySettingsOpacityText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginTop="2dp"
+                            android:text="Window Transparency: "
+                            android:textColor="@color/white"
+                            />
+
+                    <TextView
+                            android:id="@+id/overlaySettingsOpacityTextCounter"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@+id/overlaySettingsOpacityText"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginTop="2dp"
+                            android:text="100"
+                            android:textColor="@color/white"
+                            />
+
+                    <SeekBar
+                            android:id="@+id/overlaySettingsOpacitySeekbar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/overlaySettingsOpacityText"
+                            android:thumbTint="@color/purple_norm"
+                            android:progressTint="@color/purple_norm"
+                            android:min="50"
+                            android:max="100"
+                            />
+                </RelativeLayout>
+
+                <RelativeLayout
+                        android:id="@+id/settingTinyPlayer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/settingTransparency"
+                        android:layout_marginTop="10dp"
+                        >
+
+                    <TextView
+                            android:id="@+id/overlaySettingsTinyPlayerTxt"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginTop="2dp"
+                            android:text="Minimized Player Type: "
+                            android:textColor="@color/white"
+                            />
+
+                    <TextView
+                            android:id="@+id/overlaySettingsTinyPlayerType"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_toEndOf="@+id/overlaySettingsTinyPlayerTxt"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginTop="2dp"
+                            android:text="Notification"
+                            android:textColor="@color/white"
+                            />
+
+                    <TextView
+                            android:id="@+id/overlaySettingsTinyPlayerToggler"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@id/overlaySettingsTinyPlayerType"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginTop="2dp"
+                            android:text="Change to Overlay"
+                            android:textColor="@color/gray"
+                            />
+
+                </RelativeLayout>
+
+                <RelativeLayout
+                        android:id="@+id/settingRecache"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_below="@id/settingTinyPlayer"
+                        android:layout_marginTop="10dp"
+                        >
+
+                    <TextView
+                            android:id="@+id/settingRecacheText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="2dp"
+                            android:layout_marginEnd="2dp"
+                            android:layout_marginTop="2dp"
+                            android:text="Re-write image cache"
+                            android:textColor="@color/white"
+                            />
+
+                </RelativeLayout>
+
+                <TextView
+                        android:id="@+id/settingsAboutTxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:text="About/Credits"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                    android:id="@+id/overlayAboutRoot"
+                    android:layout_width="250dp"
+                    android:layout_height="200dp"
+                    android:layout_marginStart="2dp"
+                    android:layout_marginEnd="2dp"
+                    android:layout_marginBottom="2dp"
+                    android:background="@color/black"
+                    android:visibility="gone"
+                    >
+
+                <TextView
+                        android:id="@+id/mp3playerbuild"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/app_build"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"/>
+
+
+                <TextView
+                        android:id="@+id/opensrctcxt"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/mp3playerbuild"
+                        android:text="Open Source links: "
+                        android:textColor="@color/white"
+                        android:textSize="14sp"/>
+
+                <LinearLayout
+                        android:id="@+id/credDexter"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/opensrctcxt"
+                        android:orientation="vertical">
+
+                    <TextView
+                            android:layout_marginTop="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Dexter\nhttps://github.com/Karumi/Dexter"
+                            android:autoLink="web"
+                            android:linksClickable="true"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"/>
+
+                    <TextView
+                            android:layout_marginTop="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Picasso\nhttps://github.com/square/picasso"
+                            android:autoLink="web"
+                            android:linksClickable="true"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"/>
+
+                    <TextView
+                            android:layout_marginTop="10dp"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="android-youtubeExtractor\nhttps://github.com/HaarigerHarald/android-youtubeExtractor"
+                            android:autoLink="web"
+                            android:linksClickable="true"
+                            android:textColor="@color/white"
+                            android:textSize="14sp"/>
+
+
+                </LinearLayout>
 
             </RelativeLayout>
 
@@ -828,7 +1070,8 @@
                 android:id="@+id/overlayStatusbar"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:layout_below="@+id/overlayExpandedContentViewRoot">
+                android:layout_below="@+id/overlayExpandedContentViewRoot"
+                >
 
             <TextView
                     android:id="@+id/overlayStatusbarSongSizeText"
@@ -837,16 +1080,18 @@
                     android:layout_marginStart="2dp"
                     android:text="Loaded 0 songs."
                     android:textSize="14sp"
-                    android:textColor="@color/gray"
+                    android:textColor="@color/white"
                     android:singleLine="true"
                     android:ellipsize="marquee"
                     android:scrollHorizontally="true"
                     />
 
             <ImageView
+                    android:id="@+id/secret"
                     android:layout_width="20dp"
                     android:layout_height="match_parent"
-                    android:layout_alignParentEnd="true"/>
+                    android:layout_alignParentEnd="true"
+                    />
 
         </RelativeLayout>
     </RelativeLayout>

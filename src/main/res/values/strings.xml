@@ -1,4 +1,25 @@
 <resources>
     <string name="app_name">MP3 Player</string>
 
+    <!--  DOWNLOADER  -->
+    <string name="dl_header">
+        This is a guide on how to use the "Downloader".
+    </string>
+    <string name="abt_pst">
+        This is used to directly copy paste the first text from your clipboard.\nIt is recommended to use the keyboard as this may not always work.
+    </string>
+    <string name="abt_kb">
+        IMPORTANT | This is used to hide the keyboard so that you are able to type anywhere except here.\nTo enable the keyboard, tap on the input area twice. Do note that dragging the window (or) changing to a different view will reset the focus on the input, disabling the keyboard.
+    </string>
+    <string name="abt_src">
+        This is used to search the given URL if it is valid. If it is valid, it will return the <u>Name</u>, <u>Author</u> and <u>View count</u> of the video.
+    </string>
+    <string name="abt_dl">
+        This is used to download the song in <u>.mp3</u> format. It will be saved to your <u>/Downloads/</u> system folder.
+    </string>
+
+    <!--  CREDITS  -->
+
+    <!--  MISC  -->
+    <string name="app_build">MP3 Player | v1.3 / 1st Jan 2023</string>
 </resources>
