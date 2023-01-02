@@ -40,6 +40,8 @@ Overlay based Song Player for Android 6 and above
 - Either you do not have any songs, or the songs do not have an image metadata in them.
 - This can be fixed by having at least one song with image metadata, which then the application can register
 
-## Bugs
-### 1. Visualizer wont work on Android 7
+## Bugs (Last updated: 2/1/22 7:27pm IST)
+### 1. Songs will not load on rooted devices (?)
+### 2. Visualizer wont work on Android 7
+### 3. Expected to crash at times, i am not sure why exactly.
 - If you come across any more bug, please report to me at my discord `Pannikuパン肉#5360`!
